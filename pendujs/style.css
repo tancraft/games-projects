@@ -1,0 +1,63 @@
+body{
+    display: flex;
+}
+
+*, ::before, ::after{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+div{
+    display: flex;
+    flex: 1;
+}
+.centrer{
+    justify-content: center;
+}
+
+#motChoisi{
+    letter-spacing: 0.3em;
+    font-size: 4em;
+    align-items: center;
+    margin: 1.2em;
+}
+
+.contenu{
+    flex: none;
+    width: 80%;
+    align-items: center;
+}
+
+.touche{
+    font-size: 1.2em;
+    padding: 0.8em;
+    margin: 0.1em;
+    background-color: pink;
+}
+
+#clavier{
+    flex: none;
+    flex-wrap: wrap;
+}
+
+.colonne{
+    flex-direction: column;
+}
+.touche.desactive {
+    opacity: 0.65; 
+    cursor: not-allowed;
+  }
+
+  .fin{
+      display: none;
+      align-items: center;
+  }
+
+  #finDeJeu{
+      font-size: 3em;
+  }
+
+  #reload{
+    flex: none;
+  }
