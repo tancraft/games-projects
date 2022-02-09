@@ -45,7 +45,7 @@ ol {
 body {
   background-color: #34373b;
 }
-.game {
+#game {
   position: relative;
   height: 100vh;
   display: flex;

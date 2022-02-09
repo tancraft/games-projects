@@ -4,6 +4,7 @@ canvas.width = 900;
 canvas.height = 720;
 const loader = document.querySelector(".loader");
 const fullscreen = document.querySelector("#toggleScreen");
+const gamer = document.querySelector("#game");
 
 let grids = [];
 let bullets = [];
@@ -558,9 +559,8 @@ function restartGame() {
 }
 
 function toggleFullscreen() {
-  console.log(document.fullscreenElement);
   if (!document.fullscreenElement) {
-    canvas
+    gamer
       .requestFullscreen()
       .then()
       .catch((err) =>
