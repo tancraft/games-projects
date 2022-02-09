@@ -1,30 +1,23 @@
+import Game from "./game.js";
+
 const canvas = document.getElementById("canvas-1");
-const ctx = canvas.getContext("2d");
 canvas.width = 1280;
 canvas.height = 720;
-let lastTime = 0;
-let gameOver = false;
+const game = new Game(canvas);
 
-function draw() {
-  ctx.fillStyle = "blue";
-  ctx.fillRect(100, 100, 400, 100);
-}
+function gameLoop(timeStamp) {
+  const deltaTime = timeStamp - game.lastTime;
+  game.lastTime = timeStamp;
+  game.ctx.fillStyle = "black";
+  game.ctx.fillRect(0, 0, game.gamewidth, game.gameHeight);
+  console.log(deltaTime);
+  game.draw();
 
-function deltaTimeCalc(timeStamp) {
-  const deltaTime = timeStamp - lastTime;
-  lastTime = timeStamp;
-}
-
-function animate(timeStamp) {
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  deltaTimeCalc(timeStamp);
-  draw();
-  if (!gameOver) {
-    requestAnimationFrame(animate);
+  if (!game.over) {
+    requestAnimationFrame(gameLoop);
   }
 }
 
-window.addEventListener("load", function () {
-  animate(0);
+window.addEventListener("load", () => {
+  gameLoop(0);
 });
