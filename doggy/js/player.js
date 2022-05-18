@@ -9,7 +9,7 @@ import {
   JumpingRight,
   FallingLeft,
   FallingRight,
-} from "./state.js";
+} from "./State.js";
 
 export default class Player {
   constructor(gameWidth, gameHeight) {
@@ -31,9 +31,6 @@ export default class Player {
     this.image = document.querySelector("#dogimage");
     this.width = 200;
     this.height = 181.83;
-    this.fps = 30;
-    this.frameTimer = 0;
-    this.frameInterval = 1000 / this.fps;
     this.weight = 1;
     this.position = {
       x: (this.gameWidth - this.width) / 2,
@@ -49,18 +46,23 @@ export default class Player {
       y: 0,
       maxSpeed: 10,
     };
+    this.fps = 30;
+    this.frameTimer = 0;
+    this.frameInterval = 1000 / this.fps;
   }
   draw(context, deltaTime) {
     if (this.frameTimer > this.frameInterval) {
-      if (this.frame.x < this.frame.maxFrame) {
-        this.frame.x++;
-      } else {
-        this.frame.x = 0;
-      }
+      if (this.frame.x < this.frame.maxFrame) this.frame.x++;
+      else this.frame.x = 0;
       this.frameTimer = 0;
-    }else{
-        this.frameTimer += deltaTime;
+    } else {
+      this.frameTimer += deltaTime;
     }
+    // if (this.frame.x < this.frame.maxFrame) {
+    //   this.frame.x++;
+    // } else {
+    //   this.frame.x = 0;
+    // }
     context.drawImage(
       this.image,
       this.width * this.frame.x,
