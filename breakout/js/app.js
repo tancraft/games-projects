@@ -1,87 +1,202 @@
-const canvas = document.querySelector("#breakout");
-const ctx = canvas.getContext("2d");
+class Game {
+  constructor() {
+    this.canvas = document.getElementById("breakout");
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+    this.ctx = this.canvas.getContext("2d");
+    this.score = 0;
+    this.gameOver = false;
+    this.player = new Player(this);
+    this.ball = new Ball(this);
+  }
 
-canvas.width = 1200;
-canvas.height = 800;
+  restart() {}
+
+  init() {
+    const map = [
+      ["-", "-", "-", "-", "-", "-", "-", "-"],
+      ["-", "-", "-", "-", "-", "-", "-", "-"],
+      ["-", "-", "-", " ", " ", "-", "-", "-"],
+      ["-", "-", " ", " ", " ", " ", "-", "-"],
+    ];
+
+    const bundaries = [];
+
+    map.forEach((row,i) => {
+      map.forEach((symbol,j) => {
+        switch (symbol) {
+          case "-":
+            bundaries.push(new Brick({ game: this, posX: 40 * j, posY: 20 * i }));
+            break;
+        }
+      });
+    });
+    bundaries.foreach((bundary) => {
+      bundary.draw();
+    })
+    const step = () => {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      this.ctx.fillStyle = "black";
+      this.ctx.fillRect(0, 0, this.width, this.height);
+
+      this.player.update();
+      this.ball.update();
+      requestAnimationFrame(step);
+    };
+    step();
+  }
+}
+
+class InputHandler {
+  constructor(player) {
+    this.player = player;
+    this.keys = [];
+
+    window.addEventListener("keydown", (e) => {
+      if ((e.key === "q" || e.key === "d") && this.keys.indexOf(e.key) === -1) {
+        this.keys.push(e.key);
+      } else if (e.key === "Enter" && this.player.game.over) {
+        restartGame();
+      }
+    });
+    window.addEventListener("keyup", (e) => {
+      if (e.key === "q" || e.key === "d") {
+        this.keys.splice(this.keys.indexOf(e.key), 1);
+      }
+    });
+  }
+}
 
 class Player {
-  constructor() {
+  constructor(game) {
+    this.game = game;
     this.width = 100;
     this.height = 15;
-    this.position = {
-      x: (canvas.width - this.width) / 2,
-      y: canvas.height - this.height,
-    };
+    this.color = "white";
+    this.posX = (this.game.width - this.width) / 2;
+    this.posY = this.game.height - this.height;
+    this.speed = 7;
     this.velocity = {
       x: 0,
       y: 0,
     };
+    this.handler = new InputHandler(this);
   }
   draw() {
-    ctx.fillStyle = "white";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    this.game.ctx.fillStyle = this.color = this.color;
+    this.game.ctx.fillRect(this.posX, this.posY, this.width, this.height);
+  }
+
+  collision() {
+    if (this.posX <= 0) {
+      this.posX = 0;
+    } else if (this.posX >= this.game.width - this.width) {
+      this.posX = this.game.width - this.width;
+    }
   }
 
   update() {
+    this.collision();
+    this.posX += this.velocity.x;
+    if (this.handler.keys.indexOf("q") > -1) {
+      this.velocity.x = -this.speed;
+    } else if (this.handler.keys.indexOf("d") > -1) {
+      this.velocity.x = this.speed;
+    } else {
+      this.velocity.x = 0;
+    }
     this.draw();
-    this.position.x += this.velocity.x;
   }
 }
 
 class Ball {
-  constructor({ position, velocity }) {
-    this.position = position;
-    this.velocity = velocity;
+  constructor(game) {
+    this.game = game;
+    this.posX = 20;
+    this.posY = 20;
+    this.color = "yellow";
+    this.speed = 3;
     this.radius = 10;
+    this.velocity = {
+      x: this.speed,
+      y: this.speed,
+    };
   }
   draw() {
-    ctx.beginPath();
-    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "yellow";
-    ctx.fill();
-    ctx.closePath();
+    this.game.ctx.beginPath();
+    this.game.ctx.arc(this.posX, this.posY, this.radius, 0, Math.PI * 2);
+    this.game.ctx.fillStyle = this.color;
+    this.game.ctx.fill();
+    this.game.ctx.closePath();
   }
+
+  collision() {
+    if (
+      this.posX + this.velocity.x > this.game.width - this.radius ||
+      this.posX + this.velocity.x < this.radius
+    ) {
+      this.velocity.x = -this.velocity.x;
+    }
+    if (this.posY + this.velocity.y < this.radius) {
+      this.velocity.y = -this.velocity.y;
+    } else if (
+      this.posY + this.velocity.y >
+      this.game.height - this.radius - this.game.player.height * 2
+    ) {
+      if (
+        this.posY > this.game.player.posY &&
+        this.posX < this.game.player.posX + this.game.player.width
+      ) {
+        this.velocity.y = -this.velocity.y;
+      }
+    }
+  }
+
   update() {
+    this.collision();
+    this.posX += this.velocity.x;
+    this.posY += this.velocity.y;
     this.draw();
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
   }
 }
 
+const map = [
+  ["-", "-", "-", "-", "-", "-", "-", "-"],
+  ["-", "-", "-", "-", "-", "-", "-", "-"],
+  ["-", "-", "-", " ", " ", "-", "-", "-"],
+  ["-", "-", " ", " ", " ", " ", "-", "-"],
+];
+
+const bundaries = [];
+
+map.forEach((row)=>{
+  map.forEach((symbol) => {
+    switch (symbol){
+      case "-":
+        bundaries.push(new Brick({game: this.game, posX: 0, posY: 0}));
+        break;
+    }
+  });
+})
+
 class Brick {
-  constructor() {
-    this.width = 20;
-    this.height = 10;
-    this.position = {
-      x: 0,
-      y: 0,
-    };
-    this.velocity = {
-      x: 0,
-      y: 0,
-    };
+  constructor(config) {
+    this.game = config.game;
+    this.width = 40;
+    this.height = 20;
+    this.posX = config.posX;
+    this.posY = config.posY;
   }
   draw() {
-    ctx.fillStyle = "green";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-  }
-
-  update() {
-    this.draw();
-    this.position.x += this.velocity.x;
+    this.game.ctx.fillStyle = this.color;
+    this.game.ctx.fillRect(this.posX, this.posY, this.width, this.height);
   }
 }
 
 class GridBrick {
   constructor() {
-    this.position = {
-      x: 0,
-      y: 0,
-    };
-    this.velocity = {
-      x: 0,
-      y: 0,
-    };
+    this.rows = 5;
+    this.colum = 3;
 
     this.bricks = [];
 
@@ -103,6 +218,19 @@ class GridBrick {
     }
   }
 
+  draw() {
+    for (let c = 0; c < brickColumnCount; c++) {
+      for (let r = 0; r < brickRowCount; r++) {
+        if (bricks[c][r].status == 1) {
+          let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
+          let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
+          bricks[c][r].x = brickX;
+          bricks[c][r].y = brickY;
+        }
+      }
+    }
+  }
+
   update() {
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
@@ -115,82 +243,6 @@ class GridBrick {
   }
 }
 
-const player = new Player();
-const ball = new Ball({ position: { x: 20, y: 20 }, velocity: { x: 5, y: 5 } });
-const brick = new Brick();
+const game = new Game();
 
-const keys = {
-  left: {
-    pressed: false,
-  },
-  right: {
-    pressed: false,
-  },
-};
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  player.update();
-  ball.update();
-  brick.update()
-
-  //collision balle
-  if (
-    ball.position.x + ball.velocity.x > canvas.width - ball.radius ||
-    ball.position.x + ball.velocity.x < ball.radius
-  ) {
-    ball.velocity.x = -ball.velocity.x;
-  }
-  if (ball.position.y + ball.velocity.y < ball.radius) {
-    ball.velocity.y = -ball.velocity.y;
-  } else if (ball.position.y + ball.velocity.y > canvas.height - ball.radius) {
-    if (
-      ball.position.x > player.position.x &&
-      ball.position.x < player.position.x + player.width
-    ) {
-      ball.velocity.y = -ball.velocity.y;
-    } else {
-      console.log("lose");
-    }
-  }
-
-  //collision joueur
-  if (keys.left.pressed && player.position.x > 0) {
-    player.velocity.x = -7;
-  } else if (
-    keys.right.pressed &&
-    player.position.x + player.width < canvas.width
-  ) {
-    player.velocity.x = 7;
-  } else {
-    player.velocity.x = 0;
-  }
-}
-
-animate();
-
-addEventListener("keydown", ({ key }) => {
-  switch (key) {
-    case "q":
-      keys.left.pressed = true;
-      break;
-    case "d":
-      keys.right.pressed = true;
-      break;
-  }
-});
-
-addEventListener("keyup", ({ key }) => {
-  switch (key) {
-    case "q":
-      keys.left.pressed = false;
-      break;
-    case "d":
-      keys.right.pressed = false;
-      break;
-  }
-});
+game.init();

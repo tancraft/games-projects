@@ -1,69 +1,7 @@
-/*----------------------------------mixins*/
-.flex,
-.container {
-  display: flex;
-  flex-wrap: wrap;
-}
-/*-------------------------------------reset*/
 *,
 ::before,
 ::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-figure {
-  margin-block-start: 0;
-  margin-block-end: 0;
-  margin-inline-start: 0;
-  margin-inline-end: 0;
-}
-html {
-  font-size: 100%;
-  font-family: Arial, sans-serif;
-  scroll-behavior: smooth;
-}
-img,
-video,
-canvas,
-figure,
-audio,
-svg {
-  max-width: 100%;
-  height: auto;
-}
-a,
-a:visited {
-  color: #34373b;
-  text-decoration: none;
-}
-ul,
-ol {
-  list-style: inside;
-  list-style-type: none;
-}
-/*-------------------------------------layout*/
-.container {
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: black;
-  height: 100vh;
-}
-header {
-  padding: 1rem;
-  margin-bottom: 2rem;
-  color: #eeeeee;
-}
-.game {
-  position: relative;
-}
-.score {
-  padding: 1rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #eeeeee;
-}
-.score span {
-  display: inline-block;
 }
